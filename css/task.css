@@ -1,0 +1,27 @@
+.HiddenIut{
+    display:none; np/*Initially hidden*/
+}
+.HasHiddenInput{
+    padding: 5px;
+    border: solid 1px #ccc;
+}
+
+#main {
+    padding: 4px;
+    margin: 8px;
+    background-color: rgba(214, 214, 214, 0.35);
+    background-image: none;
+    position: relative;
+    min-width: 600px;
+
+#page {
+    margin: 50px auto;
+    position: relative;
+    width: 90%;
+}
+    min-width: 600px;
+    max-width: 1000px;
+}
+.bottomborder{
+    border-bottom:"1px";
+}

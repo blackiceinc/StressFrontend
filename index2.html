@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="css/task.css">
+    <script src="js/jquery-2.0.3.js">
+    </script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css"/>
+    <style>
+        #sortable {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 60%;
+        }
+
+        #sortable li {
+            margin: 0 5px 5px 5px;
+            padding: 5px;
+            font-size: 1.2em;
+            height: 1.5em;
+        }
+
+        html > body #sortable li {
+            height: 1.5em;
+            line-height: 1.2em;
+        }
+
+        .ui-state-highlight {
+            height: 1.5em;
+            line-height: 1.2em;
+        }
+    </style>
+    <script type='text/javascript' src='dwr/engine.js'></script>
+    <script type='text/javascript' src='dwr/util.js'></script>
+    <script type='text/javascript' src='dwr/interface/GetRWA.js'></script>
+    <script>
+        $(function () {
+            $("#sortable").sortable({
+                placeholder: "ui-state-highlight"
+            });
+            $("#sortable").disableSelection();
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.HasHiddenInput').hover(
+                    function () {
+                        var taskkey = getTaskKey(this.id);
+                        //alert(taskkey);
+                        //alert($(this).attr('id'));
+                        $(this).find('#taskinput_' + taskkey).stop(true, true).slideDown();
+                    },
+                    function () {
+                        var taskkey = getTaskKey(this.id);
+                        //alert('#taskinput1_' + taskkey);
+                        $(this).find('#taskinput_' + taskkey).stop(true, true).slideUp();
+                    }
+            );
+
+        });
+
+    </script>
+</head>
+<body>
+<div id="page">
+    <div id="main">
+        <table>
+            <tr>
+                <td>ACTUAL CAPITAL</td>
+                <td>=</td>
+                <td class="bottomborder"><input
+                        name="actualcapital" type="text" size="20" value="1,000,000,000"/>
+                    <hr/>
+                </td>
+                <td rowspan="2">
+                    <table>
+                        <tr>
+                            <td>=</td>
+                            <td><input
+                                    type="text" size="20"/></td>
+                            <td>EC - ECONOMIC CAPITAL</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>RWA</td>
+                <td>=</td>
+                <td><input
+                        id="RWA" type="text" size="20"/></td>
+            </tr>
+        </table>
+    </div>
+    <div id="main">
+        <table>
+            <tr>
+                <td>Scenario</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="<enter Scenario>"/></td>
+                <td>Confidence Interval</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="0.999"/></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td>PD</td>
+                <td><input
+                        id="PD" type="text" size="10" value="50.0"/>%
+                </td>
+                <td><input type="button" value="+1" size="5" onclick="addpd1()"/> <input type="button" value="+0.1"
+                                                                                         size="5" onclick="addpd01()"/>
+                    <br/><input type="button" value="-1" size="5" onclick="minuspd1()"/> <input type="button"
+                                                                                                value="-0.1" size="5"
+                                                                                                onclick="minuspd01()"/>
+                </td>
+                <td>Dimension</td>
+
+                <td><select> <option value="volvo">Choose Dimension</option>
+                    <option value="volvo">Asset Class</option>
+                    <option value="saab">Pool ID</option>
+                    <option value="mercedes">Product</option>
+                    <option value="audi">Geography</option>
+                </select></td>
+                <td>Filter</td>
+                <td><select><option value="volvo">Choose Dimension</option>
+                    <option value="volvo">Asset Class</option>
+                    <option value="saab">Pool ID</option>
+                    <option value="mercedes">Product</option>
+                    <option value="audi">Geography</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td>LGD</td>
+                <td><input
+                        id="LGD" type="text" size="10" value="50.0"/>%
+                </td>
+                <td><input type="button" value="+1" size="5" onclick="addlgd1()"/> <input type="button" value="+0.1"
+                                                                                         size="5" onclick="addlgd01()"/>
+                    <br/><input type="button" value="-1" size="5" onclick="minuslgd1()"/> <input type="button"
+                                                                                                  value="-0.1" size="5"
+                                                                                                  onclick="minuslgd01()"/>
+                </td>
+                <td>Dimension</td>
+                <td><select><option value="volvo">Choose Dimension</option>
+                    <option value="volvo">Asset Class</option>
+                    <option value="saab">Pool ID</option>
+                    <option value="mercedes">Product</option>
+                    <option value="audi">Geography</option>
+                </select></td>
+                <td>Filter</td>
+                <td><select><option value="volvo">Choose Dimension</option>
+                    <option value="volvo">Asset Class</option>
+                    <option value="saab">Pool ID</option>
+                    <option value="mercedes">Product</option>
+                    <option value="audi">Geography</option>
+                </select></td>
+            </tr>
+        </table>
+        <input type="button" value="COMPUTE" onclick="computeRWA()"/>
+    </div>
+    <div id="main">
+        <table>
+            <tr>
+                <td>Scenario</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="<Scenario Name>"/></td>
+                <td>Confidence Interval</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="99%"/></td>
+            </tr>
+        </table>
+        <div id="pd1"><table><tr><td width="100px">PD</td><td width="200px">Dimension</td><td width="200px">Filter</td></tr></table></div>
+        <div id="pd1"><table><tr><td width="100px"><input
+                name="actualcapital" type="text" size="5" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td><a onClick="deleterow();" onmouseover="this.style.cursor='pointer'"><font color="blue">delete</font></a></td></tr></table></div>
+        <div id="pd1"><table><tr><td width="100px"><input
+                name="actualcapital" type="text" size="5" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td><a onClick="deleterow();" onmouseover="this.style.cursor='pointer'"><font color="blue">delete</font></a></td></tr></table></div>
+        <div id="pd1"><table><tr><td width="100px">LGD</td><td width="200px">Dimension</td><td width="200px">Filter</td></tr></table></div>
+        <div id="pd1"><table><tr><td width="100px"><input
+                name="actualcapital" type="text" size="5" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td><a onClick="deleterow();" onmouseover="this.style.cursor='pointer'"><font color="blue">delete</font></a></td></tr></table></div>
+        <div id="pd1"><table><tr><td width="100px"><input
+                name="actualcapital" type="text" size="5" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td width="200px"><input
+                name="actualcapital" type="text" size="10" value="-10%"/></td><td><a onClick="deleterow();" onmouseover="this.style.cursor='pointer'"><font color="blue">delete</font></a></td></tr></table></div>
+        </table>
+    </div>
+    <div id="main">
+        <table>
+            <tr>
+                <td>PD</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="-10%"/></td>
+                <td>Dimension</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="Industry"/></td>
+                <td>Filter</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="Manufacturing"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="+5%"/></td>
+                <td></td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="Geography"/></td>
+                <td></td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="North America"/></td>
+            </tr>
+            <tr>
+                <td>LGD</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="+25%"/></td>
+                <td>Dimension</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="Geography"/></td>
+                <td>Filter</td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="North America"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="-15%"/></td>
+                <td></td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="Asset Class"/></td>
+                <td></td>
+                <td><input
+                        name="actualcapital" type="text" size="20" value="Corporate"/></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+</body>
+
+</html>
+<SCRIPT LANGUAGE="JavaScript">
+    <!--
+    function computeRWA() {
+        var PD = document.getElementById('PD').value/100;
+        var LGD = document.getElementById('LGD').value/100;
+        alert(80000 + " " + PD + " " + LGD);
+        GetRWA.getRWA(80000 + " " + PD + " " + LGD, callbackresult);
+
+    }
+    function callbackresult(msg) {
+        //alert(msg);
+        dwr.util.setValue('RWA', msg);
+    }
+    function addpd1() {
+        var PD = document.getElementById('PD').value;
+        PD = parseFloat(PD) + 1;
+        if (PD <= 100)
+            dwr.util.setValue('PD', PD);
+    }
+    function addpd01() {
+        var PD = document.getElementById('PD').value;
+        PD = parseFloat(PD) + 0.1;
+        if (PD <= 100)
+            dwr.util.setValue('PD', PD);
+    }
+    function minuspd1() {
+        var PD = document.getElementById('PD').value;
+        PD = parseFloat(PD) - 1;
+        if (PD >= 0)
+            dwr.util.setValue('PD', PD);
+    }
+    function minuspd01() {
+        var PD = document.getElementById('PD').value;
+        PD = parseFloat(PD) - 0.1;
+        if (PD >= 0)
+            dwr.util.setValue('PD', PD);
+    }
+    function addlgd1() {
+        var LGD = document.getElementById('LGD').value;
+        LGD = parseFloat(LGD) + 1;
+        if (LGD <= 100)
+            dwr.util.setValue('LGD', LGD);
+    }
+    function addlgd01() {
+        var LGD = document.getElementById('LGD').value;
+        LGD = parseFloat(LGD) + 0.1;
+        if (LGD <= 100)
+            dwr.util.setValue('LGD', LGD);
+    }
+    function minuslgd1() {
+        var LGD = document.getElementById('LGD').value;
+        LGD = parseFloat(LGD) - 1;
+        if (LGD >= 0)
+            dwr.util.setValue('LGD', LGD);
+    }
+    function minuslgd01() {
+        var LGD = document.getElementById('LGD').value;
+        LGD = parseFloat(LGD) - 0.1;
+        if (LGD >= 0)
+            dwr.util.setValue('LGD', LGD);
+    }
+
+    -->
+</SCRIPT>

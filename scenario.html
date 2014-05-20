@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="css/task.css">
+    <script src="js/jquery-2.0.3.js">
+    </script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css"/>
+    <style>
+        #sortable {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 60%;
+        }
+
+        #sortable li {
+            margin: 0 5px 5px 5px;
+            padding: 5px;
+            font-size: 1.2em;
+            height: 1.5em;
+        }
+
+        html > body #sortable li {
+            height: 1.5em;
+            line-height: 1.2em;
+        }
+
+        .ui-state-highlight {
+            height: 1.5em;
+            line-height: 1.2em;
+        }
+    </style>
+    <script type='text/javascript' src='dwr/engine.js'></script>
+    <script type='text/javascript' src='dwr/util.js'></script>
+    <script type='text/javascript' src='dwr/interface/Scenario.js'></script>
+    <script>
+        window.onload = function () {
+            Scenario.selectAll("", flushcallback);
+        };
+    </script>
+</head>
+<body>
+<div id="page">
+
+    <div id="main">
+        <table>
+            <tr>
+                <td>Scenario</td>
+                <td><input
+                        id="scenario" type="text" size="30" value="<enter Scenario>"/></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td><input
+                        id="description" type="text" size="30" value="<enter Scenario Description>"/></td>
+            </tr>
+            <tr>
+                <td>Confidence Interval</td>
+                <td><input
+                        id="confidence" type="text" size="30" value="<enter Confidence Interval>"/></td>
+            </tr>
+            </tr>
+        </table>
+        <input id="addbtn" type="button" value="ADD" onclick="add()"/> <font color="red"><label id="addmsg"
+                                                                                                size="30"></label></font>
+    </div>
+    <div id="main"><font color="red">
+        <label id="editmsg"
+               size="30"></label></font>
+
+        <div id="tablecontent">
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
+<SCRIPT LANGUAGE="JavaScript">
+    function add() {
+        var scenario = document.getElementById('scenario').value;
+        var describe = document.getElementById('description').value;
+        var confidence = document.getElementById('confidence').value;
+        var addedit = document.getElementById('addbtn').value;
+        var scenarios = addedit + "`|`" + scenario + "`|`" + describe + "`|`" + confidence;
+        //alert(scenarios);
+        Scenario.add(scenarios, addcallback);
+    }
+    function addcallback(msg) {
+        // alert(msg);
+        dwr.util.setValue('addmsg', msg);
+        dwr.util.setValue('scenario', "<enter Scenario>");
+        dwr.util.setValue('description', "<enter Scenario Description>");
+        dwr.util.setValue('confidence', "<enter Confidence Interval>");
+        dwr.util.setValue('addbtn', "ADD");
+        document.getElementById("scenario").readOnly = false;
+        dwr.util.setValue('editmsg', '');
+        Scenario.selectAll("", flushcallback);
+    }
+    function flushcallback(msg) {
+        //alert(msg);
+        document.getElementById("tablecontent").innerHTML = msg;
+    }
+
+    function edit(msg) {
+        //alert(msg);
+        var vals = msg.split("`|`");
+        dwr.util.setValue('scenario', vals[0]);
+        document.getElementById("scenario").readOnly = true;
+        dwr.util.setValue('description', vals[1]);
+        dwr.util.setValue('confidence', vals[2]);
+        dwr.util.setValue('addmsg', "");
+        dwr.util.setValue('addbtn', "EDIT");
+    }
+    function del(msg) {
+        // alert(msg);
+        var scenario = msg + "";
+        Scenario.del(scenario, delcallback);
+    }
+    function delcallback(msg) {
+        //alert(msg);
+        dwr.util.setValue('editmsg', msg);
+        Scenario.selectAll("", flushcallback);
+    }
+</SCRIPT>

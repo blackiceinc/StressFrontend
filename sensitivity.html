@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="css/task.css">
+    <script src="js/jquery-2.0.3.js">
+    </script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css"/>
+    <style>
+        #sortable {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 60%;
+        }
+
+        #sortable li {
+            margin: 0 5px 5px 5px;
+            padding: 5px;
+            font-size: 1.2em;
+            height: 1.5em;
+        }
+
+        html > body #sortable li {
+            height: 1.5em;
+            line-height: 1.2em;
+        }
+
+        .ui-state-highlight {
+            height: 1.5em;
+            line-height: 1.2em;
+        }
+    </style>
+    <script type='text/javascript' src='dwr/engine.js'></script>
+    <script type='text/javascript' src='dwr/util.js'></script>
+    <script type='text/javascript' src='dwr/interface/Sensitivity.js'></script>
+    <script type='text/javascript' src='dwr/interface/Scenario.js'></script>
+    <script>
+        window.onload = function () {
+            Scenario.allScenarios("", pdlgdcallback);
+        };
+    </script>
+</head>
+<body>
+<div id="page">
+    <div id="main">
+        <table>
+            <tr>
+                <td>Scenario</td>
+                <td id="pdlgdtd" width="100px"></td>
+                <td align="right">Description</td>
+                <td><input
+                        id="description" type="text" size="30" value="" readonly/></td>
+                <td align="right">Confidence Interval</td>
+                <td><input
+                        id="confidence" type="text" size="30" value="" readonly/><input
+                        id="sequence" type="hidden" size="14" value="null"/></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td width="200px">PD/LGD:</td>
+                <td width="200px">Percent:</td>
+                <td width="200px">Dimension:</td>
+                <td width="200px">Filter:</td>
+            </tr>
+            <tr>
+                <td><select id="pdlgd">
+                    <option value="null">- choose PD/LGD -</option>
+                    <option value="PD">PD</option>
+                    <option value="LGD">LGD</option>
+                </select></td>
+                <td><input
+                        id="percent" type="text" size="14" value="- enter percent +/- -"/>%
+                </td>
+                <td><select id="dimension" onchange='reportdimension(this.value)'>
+                    <option value="null">- choose Dimension -</option>
+                    <option value="Asset Class">Asset Class</option>
+                    <option value="Industry">Industry</option>
+                    <option value="Loan Size">Loan Size</option>
+                    <option value="Risk Rating">Risk Rating</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Collateral Type">Collateral Type</option>
+                    <option value="Tenor">Tenor</option>
+                </select></td>
+
+                <td id="filtertd"></td>
+            </tr>
+        </table>
+        <input id="addbtn" type="button" value="ADD" onclick="add()"/> <font color="red"> <label id="addmsg"
+                                                                                                 size="30"></label></font>
+    </div>
+    <div id="main"><font color="red">
+    <label id="editmsg"
+               size="30"></label></font>
+
+        <div id="tablecontent">
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
+<SCRIPT LANGUAGE="JavaScript">
+    function reportpdlgd(sel) {
+        if (sel != "null") {
+            Scenario.getScenario(sel, scenariocallback);
+            Sensitivity.getSensitivity(sel, flushcallback);
+        }
+    }
+    function scenariocallback(msg) {
+        var vals = msg.split("`|`");
+        dwr.util.setValue('description', vals[0]);
+        dwr.util.setValue('confidence', vals[1]);
+    }
+    function pdlgdcallback(msg) {
+        //alert(msg);
+        document.getElementById("pdlgdtd").innerHTML = msg;
+    }
+    function reportdimension(sel) {
+        if (sel != "null") {
+            Sensitivity.getFilters(sel, filtercallback);
+        }
+    }
+    function filtercallback(msg) {
+        document.getElementById("filtertd").innerHTML = msg;
+    }
+    function selfiltercallback(msg) {
+        alert(msg);
+        var vals = msg.split("`|`");
+        document.getElementById("filtertd").innerHTML = vals[0];
+        dwr.util.setValue('filter', vals[1]);
+    }
+    function add() {
+        var scenario = document.getElementById('scenarios').value;
+        var sequence = document.getElementById('sequence').value;
+        var pdlgd = document.getElementById('pdlgd').value;
+        var percent = document.getElementById('percent').value;
+        var dimension = document.getElementById('dimension').value;
+        var filter = document.getElementById('filter').value;
+        var sensitivity = scenario + "`|`" + sequence + "`|`" + pdlgd + "`|`" + percent + "`|`" + dimension + "`|`" + filter;
+        // alert(sensitivity);
+        Sensitivity.add(sensitivity, addcallback);
+    }
+    function addcallback(msg) {
+        // alert(msg);
+        dwr.util.setValue('addmsg', msg);
+        dwr.util.setValue('addbtn', "ADD");
+        dwr.util.setValue('sequence', "null");
+        dwr.util.setValue('editmsg', '');
+        var scenario = document.getElementById('scenarios').value;
+        Sensitivity.getSensitivity(scenario, flushcallback);
+    }
+
+    function flushcallback(msg) {
+        //alert(msg);
+        document.getElementById("tablecontent").innerHTML = msg;
+    }
+
+    function edit(msg) {
+        //alert(msg);
+        var vals = msg.split("`|`");
+        dwr.util.setValue('sequence', vals[0]);
+        dwr.util.setValue('pdlgd', vals[1]);
+        document.getElementById("scenarios").readOnly = true;
+        dwr.util.setValue('percent', vals[2]);
+        dwr.util.setValue('dimension', vals[3]);
+        Sensitivity.getSelFilters(vals[3]+"`|`"+vals[4], selfiltercallback);
+        dwr.util.setValue('addmsg', "");
+        dwr.util.setValue('addbtn', "EDIT");
+    }
+    function del(msg) {
+        alert(msg);
+        var scenario = document.getElementById('scenarios').value;
+        var sequence = msg;
+        Sensitivity.del(scenario + "`|`" + sequence, delcallback);
+    }
+    function delcallback(msg) {
+        //alert(msg);
+        dwr.util.setValue('editmsg', msg);
+        var scenario = document.getElementById('scenarios').value;
+        Sensitivity.getSensitivity(scenario, flushcallback);
+    }
+</SCRIPT>
